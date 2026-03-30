@@ -94,4 +94,17 @@ public class StorageFileService {
             return "application/octet-stream";
         }
     }
+
+    public void deleteFotoMenu(UUID fileId) {
+        StorageFile file = storageFileRepository.findById(fileId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found"));
+
+        try {
+            Path path = Paths.get(uploadDir).resolve(file.getPath());
+            Files.delete(path);
+            storageFileRepository.delete(file);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Gagal menghapus file dari server");
+        }
+    }
 }

@@ -78,7 +78,7 @@ public class MenuService {
 
                 // handle upload foto
                 if (!request.getFoto().isEmpty()) {
-                        List<UUID> fileIds = storageFileService.uploadMultipleFiles(request.getFoto(), "menu_photo");
+                        List<UUID> fileIds = storageFileService.uploadMultipleFiles(request.getFoto(), "menu_foto");
 
                         menu.setFoto(fileIds);
                 }
@@ -141,7 +141,8 @@ public class MenuService {
 
         public WebResponse<String> uploadFotoMenu(MenuFotoRequest request, UUID menuId) {
                 Menu menu = menuRepository.findById(menuId)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Shop not found!"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Menu not found!"));
 
                 List<UUID> currentFotos = menu.getFoto();
                 if (!request.getFoto().isEmpty()) {
@@ -154,10 +155,49 @@ public class MenuService {
                 menuRepository.save(menu);
 
                 return WebResponse.<String>builder()
-                        .code(200)
-                        .status("OK")
-                        .data("Upload foto berhasil")
-                        .errors(null)
-                        .build();
+                                .code(200)
+                                .status("OK")
+                                .data("Upload foto berhasil")
+                                .errors(null)
+                                .build();
+        }
+
+        public WebResponse<String> deleteFotoMenu(UUID menuId, UUID fileId) {
+                Menu menu = menuRepository.findById(menuId)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Menu not found!"));
+
+                List<UUID> currentFotos = menu.getFoto();
+                if (!currentFotos.contains(fileId)) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Foto tidak ditemukan!");
+                }
+
+                currentFotos.remove(fileId);
+                menu.setFoto(currentFotos);
+                menuRepository.save(menu);
+
+                storageFileService.deleteFotoMenu(fileId);
+
+                return WebResponse.<String>builder()
+                                .code(200)
+                                .status("OK")
+                                .data("Delete foto berhasil")
+                                .errors(null)
+                                .build();
+        }
+
+        public WebResponse<String> deleteMenu(UUID menuId) {
+                Menu menu = menuRepository.findById(menuId)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Menu not found!"));
+
+                menuRepository.delete(menu);
+
+                return WebResponse.<String>builder()
+                                .code(200)
+                                .status("OK")
+                                .data("Delete menu berhasil")
+                                .errors(null)
+                                .build();
         }
 }

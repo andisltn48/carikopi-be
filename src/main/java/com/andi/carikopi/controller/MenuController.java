@@ -1,5 +1,6 @@
 package com.andi.carikopi.controller;
 
+import com.andi.carikopi.dto.MenuFotoRequest;
 import com.andi.carikopi.dto.MenuRequest;
 import com.andi.carikopi.dto.MenuResponse;
 import com.andi.carikopi.dto.WebResponse;
@@ -39,5 +40,22 @@ public class MenuController {
     @GetMapping("/{menuId}/detail")
     public WebResponse<MenuResponse> detail(@PathVariable("menuId") UUID menuId) {
         return menuService.getDetailMenu(menuId);
+    }
+
+    @PostMapping(value = "/{menuId}/upload-foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public WebResponse<String> uploadFoto(@ModelAttribute @Valid @RequestBody MenuFotoRequest request,
+            @PathVariable("menuId") UUID menuId) {
+        return menuService.uploadFotoMenu(request, menuId);
+    }
+
+    @DeleteMapping("/{menuId}/delete-foto/{fileId}")
+    public WebResponse<String> deleteFoto(@PathVariable("menuId") UUID menuId,
+            @PathVariable("fileId") UUID fileId) {
+        return menuService.deleteFotoMenu(menuId, fileId);
+    }
+
+    @DeleteMapping("/{menuId}/delete")
+    public WebResponse<String> delete(@PathVariable("menuId") UUID menuId) {
+        return menuService.deleteMenu(menuId);
     }
 }
