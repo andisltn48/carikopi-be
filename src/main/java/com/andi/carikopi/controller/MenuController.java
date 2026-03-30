@@ -51,7 +51,7 @@ public class MenuController {
     @DeleteMapping("/{menuId}/delete-foto/{fileId}")
     public WebResponse<String> deleteFoto(@PathVariable("menuId") UUID menuId,
             @PathVariable("fileId") UUID fileId) {
-        return menuService.deleteFotoMenu(menuId, fileId);
+        return menuService.deleteFile(menuId, fileId);
     }
 
     @DeleteMapping("/{menuId}/delete")

@@ -162,7 +162,7 @@ public class MenuService {
                                 .build();
         }
 
-        public WebResponse<String> deleteFotoMenu(UUID menuId, UUID fileId) {
+        public WebResponse<String> deleteFile(UUID menuId, UUID fileId) {
                 Menu menu = menuRepository.findById(menuId)
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                 "Menu not found!"));
@@ -176,7 +176,7 @@ public class MenuService {
                 menu.setFoto(currentFotos);
                 menuRepository.save(menu);
 
-                storageFileService.deleteFotoMenu(fileId);
+                storageFileService.deleteFile(fileId);
 
                 return WebResponse.<String>builder()
                                 .code(200)

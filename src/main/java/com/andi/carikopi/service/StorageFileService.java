@@ -95,7 +95,7 @@ public class StorageFileService {
         }
     }
 
-    public void deleteFotoMenu(UUID fileId) {
+    public void deleteFile(UUID fileId) {
         StorageFile file = storageFileRepository.findById(fileId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found"));
 

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,10 @@ public class CoffeeShop {
     private String alamat;
     private String deskripsi;
     private String tags;
+    private UUID fotoProfil;
+
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    private Point location;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
