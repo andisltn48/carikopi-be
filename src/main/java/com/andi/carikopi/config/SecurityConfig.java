@@ -28,6 +28,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/files/**").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/coffeeshop/nearby").permitAll()
                         .anyRequest().authenticated())

@@ -194,4 +194,37 @@ public class CoffeeShopService {
                 .data("Foto profil berhasil dihapus")
                 .build();
     }
+
+    public WebResponse<CoffeeShopResponse> getDetailCoffeeShopPublic(UUID shopId) {
+        CoffeeShop coffeeShop = coffeeShopRepository.findById(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coffee shop not found"));
+
+        CoffeeShopResponse response = CoffeeShopResponse.builder()
+                .id(coffeeShop.getId())
+                .namaToko(coffeeShop.getNamaToko())
+                .alamat(coffeeShop.getAlamat())
+                .deskripsi(coffeeShop.getDeskripsi())
+                .tags(coffeeShop.getTags())
+                .build();
+
+        if (coffeeShop.getLocation() != null) {
+            response.setLatitude(coffeeShop.getLocation().getY());
+            response.setLongitude(coffeeShop.getLocation().getX());
+        }
+
+        StorageFile storageFile = storageFileService.findById(coffeeShop.getFotoProfil());
+        String fullUrl = appUrl + "api/files/" + storageFile.getId();
+        StorageFileResponse storageFileResponse = StorageFileResponse.builder()
+                .id(storageFile.getId())
+                .url(fullUrl)
+                .filename(storageFile.getFilename())
+                .build();
+        response.setFotoProfil(storageFileResponse);
+
+        return WebResponse.<CoffeeShopResponse>builder()
+                .code(200)
+                .status("OK")
+                .data(response)
+                .build();
+    }
 }

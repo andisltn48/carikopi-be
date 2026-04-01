@@ -26,4 +26,5 @@ public class CoffeeShopResponse {
     private Double distance;
     private UserResponse user;
     private StorageFileResponse fotoProfil;
+    private MenuResponse menu;
 }
