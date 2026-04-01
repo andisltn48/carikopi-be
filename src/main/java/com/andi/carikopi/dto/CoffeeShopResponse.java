@@ -25,4 +25,5 @@ public class CoffeeShopResponse {
     private Double longitude;
     private Double distance;
     private UserResponse user;
+    private StorageFileResponse fotoProfil;
 }

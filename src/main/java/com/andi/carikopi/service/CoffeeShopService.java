@@ -2,9 +2,11 @@ package com.andi.carikopi.service;
 
 import com.andi.carikopi.dto.CoffeeShopRequest;
 import com.andi.carikopi.dto.CoffeeShopResponse;
+import com.andi.carikopi.dto.StorageFileResponse;
 import com.andi.carikopi.dto.UserResponse;
 import com.andi.carikopi.dto.WebResponse;
 import com.andi.carikopi.entity.CoffeeShop;
+import com.andi.carikopi.entity.StorageFile;
 import com.andi.carikopi.entity.User;
 import com.andi.carikopi.repository.CoffeeShopRepository;
 import com.andi.carikopi.repository.UserRepository;
@@ -13,6 +15,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,10 +29,15 @@ import java.util.UUID;
 public class CoffeeShopService {
     @Autowired
     private CoffeeShopRepository coffeeShopRepository;
+
     @Autowired
     private UserRepository userRepository;
+    
     @Autowired
     private StorageFileService storageFileService;
+
+    @Value("${app.url}")
+    private String appUrl;
 
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
@@ -91,16 +99,16 @@ public class CoffeeShopService {
                     .tags((String) row[5])
                     .build();
 
-            // Extract lat/lng from the Point geometry
+            // Extract lat/lng from the Point geometry (native queries return Geolatte types)
             if (row[7] != null) {
-                Point point = (Point) row[7];
-                response.setLatitude(point.getY());
-                response.setLongitude(point.getX());
+                org.geolatte.geom.Point<?> point = (org.geolatte.geom.Point<?>) row[7];
+                response.setLatitude(point.getPosition().getCoordinate(1));
+                response.setLongitude(point.getPosition().getCoordinate(0));
             }
 
             // Distance in meters (last column from query)
             if (row[row.length - 1] != null) {
-                response.setDistance(((Number) row[row.length - 1]).doubleValue());
+                response.setDistance(((Number) row[row.length - 1]).doubleValue() / 1000);
             }
 
             responses.add(response);
@@ -121,13 +129,21 @@ public class CoffeeShopService {
                 .role(user.getRole())
                 .build();
 
+        StorageFile file = storageFileService.findById(coffeeShop.getFotoProfil());
+        String fullUrl = appUrl + "api/files/" + file.getId();
+        StorageFileResponse storageFileResponse = StorageFileResponse.builder()
+                .id(file.getId())
+                .url(fullUrl)
+                .filename(file.getFilename())
+                .build();
         CoffeeShopResponse.CoffeeShopResponseBuilder builder = CoffeeShopResponse.builder()
                 .id(coffeeShop.getId())
                 .namaToko(coffeeShop.getNamaToko())
                 .alamat(coffeeShop.getAlamat())
                 .deskripsi(coffeeShop.getDeskripsi())
                 .user(userResponse)
-                .tags(coffeeShop.getTags());
+                .tags(coffeeShop.getTags())
+                .fotoProfil(storageFileResponse);
 
         if (coffeeShop.getLocation() != null) {
             builder.latitude(coffeeShop.getLocation().getY());
