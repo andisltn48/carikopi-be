@@ -1,8 +1,11 @@
 package com.andi.carikopi.service;
 
+import com.andi.carikopi.dto.AuthResponse;
 import com.andi.carikopi.dto.UserRequest;
 import com.andi.carikopi.dto.WebResponse;
+import com.andi.carikopi.entity.CoffeeShop;
 import com.andi.carikopi.entity.User;
+import com.andi.carikopi.repository.CoffeeShopRepository;
 import com.andi.carikopi.repository.UserRepository;
 import com.andi.carikopi.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +18,14 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthService {
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private CoffeeShopRepository coffeeShopRepository;
     @Autowired private JwtUtil jwtUtil;
 
     public WebResponse<String> register(UserRequest request){
+        //check username
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists");
+        }
         User user = new User();
         user.setUsername(request.getUsername());
 
@@ -25,7 +33,12 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(encodedPassword);
         user.setRole(2);
+
+        CoffeeShop coffeeShop = new CoffeeShop();
+        coffeeShop.setUser(user);
+
         userRepository.save(user);
+        coffeeShopRepository.save(coffeeShop);
 
         String msg = "User created successfully";
         return WebResponse.<String>builder()
@@ -35,16 +48,20 @@ public class AuthService {
                 .build();
     }
 
-    public WebResponse<String> login(UserRequest request){
+    public WebResponse<AuthResponse> login(UserRequest request){
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("userNotFound"));
 
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())){
             String token = jwtUtil.generateToken(user.getUsername());
-            return WebResponse.<String>builder()
+            AuthResponse authResponse = AuthResponse.builder()
+                    .token(token)
+                    .role(user.getRole())
+                    .build();
+            return WebResponse.<AuthResponse>builder()
                     .code(200)
                     .status("OK")
-                    .data(token)
+                    .data(authResponse)
                     .build();
         }
 

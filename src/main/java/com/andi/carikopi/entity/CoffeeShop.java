@@ -20,12 +20,19 @@ public class CoffeeShop {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String namaToko;
 
+    @Column(nullable = true)
     private String alamat;
+
+    @Column(nullable = true)
     private String deskripsi;
+
+    @Column(nullable = true)
     private String tags;
+
+    @Column(nullable = true)
     private UUID fotoProfil;
 
     @Column(columnDefinition = "geometry(Point, 4326)")

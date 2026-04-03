@@ -84,31 +84,51 @@ public class CoffeeShopService {
         return getCoffeeShopResponseWebResponse(user, coffeeShop, null);
     }
 
-    public WebResponse<List<CoffeeShopResponse>> findNearby(double lat, double lng, double radiusKm) {
+    public WebResponse<List<CoffeeShopResponse>> find(double lat, double lng, double radiusKm, String query) {
         double radiusMeters = radiusKm * 1000;
 
-        List<Object[]> results = coffeeShopRepository.findNearby(lat, lng, radiusMeters);
+        List<Object[]> results;
+        if (query != null && !query.isBlank()) {
+            results = coffeeShopRepository.findNearbyByName(lat, lng, radiusMeters, query.trim());
+        } else {
+            results = coffeeShopRepository.findNearby(lat, lng, radiusMeters);
+        }
 
         List<CoffeeShopResponse> responses = new ArrayList<>();
         for (Object[] row : results) {
+            // Native query column order (PostgreSQL alphabetical):
+            // 0=id, 1=alamat, 2=deskripsi, 3=foto_profil, 4=location, 5=nama_toko, 6=tags, 7=user_id, 8=jarak
             CoffeeShopResponse response = CoffeeShopResponse.builder()
                     .id((UUID) row[0])
-                    .namaToko((String) row[2])
-                    .alamat((String) row[3])
-                    .deskripsi((String) row[4])
-                    .tags((String) row[5])
+                    .alamat((String) row[1])
+                    .deskripsi((String) row[2])
+                    .namaToko((String) row[5])
+                    .tags((String) row[6])
                     .build();
 
+            // foto_profil (UUID at index 3)
+            if (row[3] != null) {
+                UUID fotoProfilId = (UUID) row[3];
+                StorageFile file = storageFileService.findById(fotoProfilId);
+                String fullUrl = appUrl + "api/files/" + file.getId();
+                StorageFileResponse storageFileResponse = StorageFileResponse.builder()
+                        .id(file.getId())
+                        .url(fullUrl)
+                        .filename(file.getFilename())
+                        .build();
+                response.setFotoProfil(storageFileResponse);
+            }
+
             // Extract lat/lng from the Point geometry (native queries return Geolatte types)
-            if (row[7] != null) {
-                org.geolatte.geom.Point<?> point = (org.geolatte.geom.Point<?>) row[7];
+            if (row[4] != null) {
+                org.geolatte.geom.Point<?> point = (org.geolatte.geom.Point<?>) row[4];
                 response.setLatitude(point.getPosition().getCoordinate(1));
                 response.setLongitude(point.getPosition().getCoordinate(0));
             }
 
-            // Distance in meters (last column from query)
-            if (row[row.length - 1] != null) {
-                response.setDistance(((Number) row[row.length - 1]).doubleValue() / 1000);
+            // Distance in meters (last column = jarak at index 8)
+            if (row[8] != null) {
+                response.setDistance(((Number) row[8]).doubleValue() / 1000);
             }
 
             responses.add(response);
@@ -129,13 +149,16 @@ public class CoffeeShopService {
                 .role(user.getRole())
                 .build();
 
-        StorageFile file = storageFileService.findById(coffeeShop.getFotoProfil());
-        String fullUrl = appUrl + "api/files/" + file.getId();
-        StorageFileResponse storageFileResponse = StorageFileResponse.builder()
-                .id(file.getId())
-                .url(fullUrl)
-                .filename(file.getFilename())
-                .build();
+        StorageFileResponse storageFileResponse = null;
+        if (coffeeShop.getFotoProfil() != null) {
+            StorageFile file = storageFileService.findById(coffeeShop.getFotoProfil());
+            String fullUrl = appUrl + "api/files/" + file.getId();
+            storageFileResponse = StorageFileResponse.builder()
+                    .id(file.getId())
+                    .url(fullUrl)
+                    .filename(file.getFilename())
+                    .build();
+        }
         CoffeeShopResponse.CoffeeShopResponseBuilder builder = CoffeeShopResponse.builder()
                 .id(coffeeShop.getId())
                 .namaToko(coffeeShop.getNamaToko())

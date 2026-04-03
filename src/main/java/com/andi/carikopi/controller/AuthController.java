@@ -1,5 +1,6 @@
 package com.andi.carikopi.controller;
 
+import com.andi.carikopi.dto.AuthResponse;
 import com.andi.carikopi.dto.UserRequest;
 import com.andi.carikopi.dto.WebResponse;
 import com.andi.carikopi.service.AuthService;
@@ -20,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public WebResponse<String> login(@RequestBody UserRequest request){
+    public WebResponse<AuthResponse> login(@RequestBody UserRequest request){
         return authService.login(request);
     }
 }

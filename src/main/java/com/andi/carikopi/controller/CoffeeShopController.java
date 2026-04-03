@@ -31,15 +31,6 @@ public class CoffeeShopController {
         return coffeeShopService.getMyCoffeeShop(principal.getName());
     }
 
-    @GetMapping("/nearby")
-    public WebResponse<List<CoffeeShopResponse>> getNearby(
-            @RequestParam("lat") double lat,
-            @RequestParam("lng") double lng,
-            @RequestParam(value = "radius", defaultValue = "5") double radiusKm
-    ) {
-        return coffeeShopService.findNearby(lat, lng, radiusKm);
-    }
-
     @PostMapping("/foto-profil/upload/{shopId}")
     public WebResponse<String> uploadFotoProfil(@RequestParam("file") MultipartFile file, @PathVariable("shopId") UUID shopId) {
         return coffeeShopService.uploadFotoProfil(file, shopId);

@@ -31,4 +31,26 @@ public interface CoffeeShopRepository extends JpaRepository<CoffeeShop, UUID> {
             @Param("lng") double lng,
             @Param("radiusMeters") double radiusMeters
     );
+
+    @Query(value = """
+            SELECT cs.*, ST_Distance(
+                cs.location::geography,
+                ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography
+            ) AS jarak
+            FROM coffeeshops cs
+            WHERE cs.location IS NOT NULL
+            AND cs.nama_toko ILIKE CONCAT('%', :query, '%')
+            AND ST_DWithin(
+                cs.location::geography,
+                ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
+                :radiusMeters
+            )
+            ORDER BY jarak ASC
+            """, nativeQuery = true)
+    List<Object[]> findNearbyByName(
+            @Param("lat") double lat,
+            @Param("lng") double lng,
+            @Param("radiusMeters") double radiusMeters,
+            @Param("query") String query
+    );
 }
