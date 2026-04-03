@@ -44,4 +44,22 @@ public class CoffeeShop {
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
     private List<Menu> menus;
+
+    @Column(nullable = true)
+    private String city;
+
+    @Column(nullable = true)
+    private String instagram;
+
+    @Column(nullable = true)
+    private String tiktok;
+
+    @Column(nullable = true)
+    private String whatsapp;
+
+    @Column(nullable = true)
+    private String facebook;
+
+    @Column(nullable = true)
+    private String twitter;
 }

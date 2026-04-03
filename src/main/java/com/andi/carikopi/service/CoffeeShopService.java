@@ -58,6 +58,12 @@ public class CoffeeShopService {
         coffeeShop.setDeskripsi(request.getDeskripsi());
         coffeeShop.setUser(user);
         coffeeShop.setTags(request.getTags());
+        coffeeShop.setCity(request.getCity());
+        coffeeShop.setInstagram(request.getInstagram());
+        coffeeShop.setTiktok(request.getTiktok());
+        coffeeShop.setWhatsapp(request.getWhatsapp());
+        coffeeShop.setFacebook(request.getFacebook());
+        coffeeShop.setTwitter(request.getTwitter());
 
         if (request.getFotoProfil() != null) {
             UUID fileId = storageFileService.uploadFile(request.getFotoProfil(), "foto_profil");
@@ -166,7 +172,13 @@ public class CoffeeShopService {
                 .deskripsi(coffeeShop.getDeskripsi())
                 .user(userResponse)
                 .tags(coffeeShop.getTags())
-                .fotoProfil(storageFileResponse);
+                .fotoProfil(storageFileResponse)
+                .city(coffeeShop.getCity())
+                .instagram(coffeeShop.getInstagram())
+                .tiktok(coffeeShop.getTiktok())
+                .whatsapp(coffeeShop.getWhatsapp())
+                .facebook(coffeeShop.getFacebook())
+                .twitter(coffeeShop.getTwitter());
 
         if (coffeeShop.getLocation() != null) {
             builder.latitude(coffeeShop.getLocation().getY());
@@ -228,6 +240,12 @@ public class CoffeeShopService {
                 .alamat(coffeeShop.getAlamat())
                 .deskripsi(coffeeShop.getDeskripsi())
                 .tags(coffeeShop.getTags())
+                .city(coffeeShop.getCity())
+                .instagram(coffeeShop.getInstagram())
+                .tiktok(coffeeShop.getTiktok())
+                .whatsapp(coffeeShop.getWhatsapp())
+                .facebook(coffeeShop.getFacebook())
+                .twitter(coffeeShop.getTwitter())
                 .build();
 
         if (coffeeShop.getLocation() != null) {

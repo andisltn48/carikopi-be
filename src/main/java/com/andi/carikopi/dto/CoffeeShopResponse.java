@@ -27,4 +27,11 @@ public class CoffeeShopResponse {
     private UserResponse user;
     private StorageFileResponse fotoProfil;
     private MenuResponse menu;
+    private String city;
+
+    private String instagram;
+    private String tiktok;
+    private String whatsapp;
+    private String facebook;
+    private String twitter;
 }

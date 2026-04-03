@@ -18,4 +18,11 @@ public class CoffeeShopRequest {
     private String tags;
     private Double latitude;
     private Double longitude;
+    private String city;
+
+    private String instagram;
+    private String tiktok;
+    private String whatsapp;
+    private String facebook;
+    private String twitter;
 }
