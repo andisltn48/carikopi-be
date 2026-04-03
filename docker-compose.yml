@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: carikopi-db
+    environment:
+      POSTGRES_DB: carikopi
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d carikopi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  carikopiapp:
+    build: .
+    container_name: carikopi-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    environment:
+      # Override application.properties for container context
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/carikopi
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: mysecretpassword
+      APP_URL: http://localhost:8082/
+      # Make sure the app can write to the uploads folder
+      APP_UPLOAD_DIR: /app/uploads/
+    volumes:
+      - ./uploads:/app/uploads
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: carikopi-tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=eyJhIjoiZjUzZTYyZjFkZGExZDZiNGViYWY2ODc0MGFlNThhNDgiLCJ0IjoiMzJjNWRiOTEtYmVjMS00NjIyLWE3ZmEtN2M2ZmVmNjFiMDVjIiwicyI6Ik9URTNNRE01TXprdE9XTXpZeTAwT0daaExUZ3pPV0V0WldFME9HTTBNV1V6TkRCbCJ9
+    depends_on:
+      - carikopiapp
+volumes:
+  postgres_data:

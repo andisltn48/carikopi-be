@@ -1,0 +1,33 @@
+# Build artifacts
+target/
+*.jar
+*.war
+*.ear
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Logs and temp
+logs/
+*.log
+tmp/
+uploads/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
