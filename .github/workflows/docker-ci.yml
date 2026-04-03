@@ -9,13 +9,30 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  DEPLOY_PATH: /home/andislhr/projects/carikopi-be
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
+
+    # PostGIS service for tests
+    services:
+      db:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: carikopi
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci_password
+        ports:
+          - 5433:5432 # Map to 5433 to avoid conflict with local production db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - name: Checkout repository
@@ -30,6 +47,10 @@ jobs:
 
     - name: Build and Test with Maven
       run: ./mvnw -B clean verify --file pom.xml
+      env:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5433/carikopi
+        SPRING_DATASOURCE_USERNAME: postgres
+        SPRING_DATASOURCE_PASSWORD: ci_password
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -61,3 +82,17 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: self-hosted
+    steps:
+    - name: Deploy to local environment
+      run: |
+        cd ${{ env.DEPLOY_PATH }}
+        # Ensure we have the latest docker-compose etc.
+        # Use git pull if the runner is in the repo directory, but we can also build from GHCR.
+        # To avoid downtime and ensure speed, we can use the local checkout.
+        git pull origin main
+        docker compose up -d --build
