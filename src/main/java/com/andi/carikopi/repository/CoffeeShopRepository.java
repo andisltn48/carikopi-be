@@ -13,7 +13,10 @@ public interface CoffeeShopRepository extends JpaRepository<CoffeeShop, UUID> {
     CoffeeShop findCoffeeShopByUser(User user);
 
     @Query(value = """
-            SELECT cs.*, ST_Distance(
+            SELECT cs.id, cs.alamat, cs.deskripsi, cs.foto_profil, cs.location,
+                   cs.nama_toko, cs.tags, cs.city, cs.instagram, cs.tiktok,
+                   cs.whatsapp, cs.facebook, cs.twitter,
+                   ST_Distance(
                 cs.location::geography,
                 ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography
             ) AS jarak
@@ -33,7 +36,10 @@ public interface CoffeeShopRepository extends JpaRepository<CoffeeShop, UUID> {
     );
 
     @Query(value = """
-            SELECT cs.*, ST_Distance(
+            SELECT cs.id, cs.alamat, cs.deskripsi, cs.foto_profil, cs.location,
+                   cs.nama_toko, cs.tags, cs.city, cs.instagram, cs.tiktok,
+                   cs.whatsapp, cs.facebook, cs.twitter,
+                   ST_Distance(
                 cs.location::geography,
                 ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography
             ) AS jarak

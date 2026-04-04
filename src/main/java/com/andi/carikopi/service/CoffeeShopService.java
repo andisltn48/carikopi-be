@@ -102,14 +102,22 @@ public class CoffeeShopService {
 
         List<CoffeeShopResponse> responses = new ArrayList<>();
         for (Object[] row : results) {
-            // Native query column order (PostgreSQL alphabetical):
-            // 0=id, 1=alamat, 2=deskripsi, 3=foto_profil, 4=location, 5=nama_toko, 6=tags, 7=user_id, 8=jarak
+            // Mapping based on explicit SELECT in Native Query:
+            // 0=id, 1=alamat, 2=deskripsi, 3=foto_profil, 4=location, 
+            // 5=nama_toko, 6=tags, 7=city, 8=instagram, 9=tiktok, 
+            // 10=whatsapp, 11=facebook, 12=twitter, 13=jarak
             CoffeeShopResponse response = CoffeeShopResponse.builder()
                     .id((UUID) row[0])
                     .alamat((String) row[1])
                     .deskripsi((String) row[2])
                     .namaToko((String) row[5])
                     .tags((String) row[6])
+                    .city((String) row[7])
+                    .instagram((String) row[8])
+                    .tiktok((String) row[9])
+                    .whatsapp((String) row[10])
+                    .facebook((String) row[11])
+                    .twitter((String) row[12])
                     .build();
 
             // foto_profil (UUID at index 3)
@@ -132,9 +140,9 @@ public class CoffeeShopService {
                 response.setLongitude(point.getPosition().getCoordinate(0));
             }
 
-            // Distance in meters (last column = jarak at index 8)
-            if (row[8] != null) {
-                response.setDistance(((Number) row[8]).doubleValue() / 1000);
+            // Distance in meters (jarak at index 13)
+            if (row[13] != null) {
+                response.setDistance(((Number) row[13]).doubleValue() / 1000);
             }
 
             responses.add(response);
