@@ -31,7 +31,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/carikopi
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: mysecretpassword
-      APP_URL: http://localhost:8082/
+      APP_URL: https://carikopi-api.capturah.my.id/
       # Make sure the app can write to the uploads folder
       APP_UPLOAD_DIR: /app/uploads/
     volumes:
