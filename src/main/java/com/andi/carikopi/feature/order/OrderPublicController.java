@@ -1,6 +1,7 @@
 package com.andi.carikopi.feature.order;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -22,18 +23,16 @@ public class OrderPublicController {
 
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public WebResponse<Order> createOrder(@RequestBody OrderRequest request) {
+    public WebResponse<String> createOrder(@RequestBody OrderRequest request) {
         return orderService.createOrder(request);
     }
 
-    @GetMapping(path = "/get-by-unique-session/{uniqueSession}", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public WebResponse<List<Order>> getOrderByUniqueSession(@PathVariable("uniqueSession") String uniqueSession) {
-        return orderService.getOrderByUniqueSession(uniqueSession);
+    @GetMapping(path = "/get-by-unique-session/{uniqueSession}/{shopId}")
+    public WebResponse<List<Order>> getOrderByUniqueSession(@PathVariable("uniqueSession") String uniqueSession, @PathVariable("shopId") UUID shopId) {
+        return orderService.getOrderByUniqueSessionAndShopId(uniqueSession, shopId);
     }
 
-    @GetMapping(path = "/get-by-order-number/{orderNumber}", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/get-by-order-number/{orderNumber}")
     public WebResponse<Order> getOrderByOrderNumber(@PathVariable("orderNumber") String orderNumber) {
         return orderService.getOrderByOrderNumber(orderNumber);
     }

@@ -5,15 +5,18 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderRequest {
     private String name;
     private String phone;
-    private String note;
 
     @JsonProperty("total_price")
     private Integer totalPrice;

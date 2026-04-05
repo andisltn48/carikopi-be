@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.andi.carikopi.feature.auth.User;
 import com.andi.carikopi.feature.menu.Menu;
 
@@ -37,13 +38,16 @@ public class CoffeeShop {
     @Column(nullable = true)
     private UUID fotoProfil;
 
+    @JsonIgnore
     @Column(columnDefinition = "geometry(Point, 4326)")
     private Point location;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
     private List<Menu> menus;
 

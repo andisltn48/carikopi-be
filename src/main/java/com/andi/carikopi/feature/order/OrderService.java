@@ -3,6 +3,7 @@ package com.andi.carikopi.feature.order;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,10 @@ import com.andi.carikopi.feature.order.dto.OrderRequest;
 @Service
 public class OrderService {
     @Autowired private OrderRepository orderRepository;
-    @Autowired private OrderMenuRepository orderMenuRepository;
     @Autowired private CoffeeShopRepository coffeeShopRepository;
     @Autowired private MenuRepository menuRepository;
 
-    public WebResponse<Order> createOrder(OrderRequest request){
+    public WebResponse<String> createOrder(OrderRequest request){
         
         CoffeeShop shop = coffeeShopRepository.findById(request.getShopId())
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coffee shop not found"));
@@ -48,21 +48,22 @@ public class OrderService {
             orderMenu.setMenu(menu);
             orderMenu.setQuantity(orderMenuRequest.getQuantity());
             orderMenu.setTotalPrice(orderMenuRequest.getTotalPrice());
-            orderMenuRepository.save(orderMenu);
+            orderMenu.setNotes(orderMenuRequest.getNotes());
+            orderMenu.setOrder(order);
 
             orderMenus.add(orderMenu);
         }
         order.setOrderMenus(orderMenus);
         orderRepository.save(order);
-        return WebResponse.<Order>builder()
+        return WebResponse.<String>builder()
                 .status("OK")
                 .code(200)
-                .data(order)
+                .data("Order created successfully")
                 .build();
     }
 
-    public WebResponse<List<Order>> getOrderByUniqueSession(String uniqueSession){
-        List<Order> order = orderRepository.findAllByUniqueSession(uniqueSession);
+    public WebResponse<List<Order>> getOrderByUniqueSessionAndShopId(String uniqueSession, UUID shopId){
+        List<Order> order = orderRepository.findAllByUniqueSessionAndShopId(uniqueSession, shopId);
         return WebResponse.<List<Order>>builder()
                 .status("OK")
                 .code(200)
