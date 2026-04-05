@@ -1,6 +1,6 @@
 package com.andi.carikopi.security;
 
-import com.andi.carikopi.dto.WebResponse;
+import com.andi.carikopi.common.WebResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
