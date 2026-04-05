@@ -3,13 +3,11 @@ package com.andi.carikopi.feature.coffeeshop;
 import com.andi.carikopi.feature.coffeeshop.dto.CoffeeShopRequest;
 import com.andi.carikopi.feature.coffeeshop.dto.CoffeeShopResponse;
 import com.andi.carikopi.common.WebResponse;
-import com.andi.carikopi.feature.coffeeshop.CoffeeShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.UUID;
 
 @RestController

@@ -1,7 +1,5 @@
 package com.andi.carikopi.feature.storage;
 
-import com.andi.carikopi.feature.storage.StorageFile;
-import com.andi.carikopi.feature.storage.StorageFileRepository;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.beans.factory.annotation.Autowired;

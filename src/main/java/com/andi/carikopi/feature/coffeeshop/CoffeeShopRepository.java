@@ -1,6 +1,5 @@
 package com.andi.carikopi.feature.coffeeshop;
 
-import com.andi.carikopi.feature.coffeeshop.CoffeeShop;
 import com.andi.carikopi.feature.auth.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

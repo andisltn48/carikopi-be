@@ -1,6 +1,5 @@
 package com.andi.carikopi.feature.auth;
 
-import com.andi.carikopi.feature.auth.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

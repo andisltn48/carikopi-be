@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.andi.carikopi.feature.coffeeshop.dto.CoffeeShopResponse;
 import com.andi.carikopi.feature.menu.dto.MenuResponse;
 import com.andi.carikopi.common.WebResponse;
-import com.andi.carikopi.feature.coffeeshop.CoffeeShopService;
 import com.andi.carikopi.feature.menu.MenuService;
 
 @RestController

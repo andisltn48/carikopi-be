@@ -1,5 +1,4 @@
 package com.andi.carikopi.common;
-import com.andi.carikopi.security.JwtUtil;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

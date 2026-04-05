@@ -3,7 +3,6 @@ package com.andi.carikopi.feature.auth;
 import com.andi.carikopi.feature.auth.dto.AuthResponse;
 import com.andi.carikopi.feature.auth.dto.UserRequest;
 import com.andi.carikopi.common.WebResponse;
-import com.andi.carikopi.feature.auth.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
