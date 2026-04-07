@@ -7,10 +7,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.andi.carikopi.common.PagingResponse;
 import com.andi.carikopi.common.WebResponse;
 import com.andi.carikopi.feature.coffeeshop.CoffeeShop;
 import com.andi.carikopi.feature.coffeeshop.CoffeeShopRepository;
@@ -148,15 +152,29 @@ public class OrderService {
         return orderResponse;
     }
 
-    public WebResponse<List<OrderResponse>> getOrderByShopId(UUID shopId, String orderNumber){
-        List<Order> orders;
+    public WebResponse<List<OrderResponse>> getOrderByShopId(UUID shopId, String orderNumber, Integer page, Integer size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Order> orders;
         if (orderNumber != null && !orderNumber.isBlank()) {
-            orders = orderRepository.findAllByShopIdAndOrderNumberContainingIgnoreCaseOrderByCreatedAtAsc(shopId, orderNumber);
+            orders = orderRepository.findAllByShopIdAndOrderNumberContainingIgnoreCaseOrderByCreatedAtAsc(shopId, orderNumber, pageable);
         } else {
-            orders = orderRepository.findAllByShopIdOrderByCreatedAtAsc(shopId);
+            orders = orderRepository.findAllByShopIdOrderByCreatedAtAsc(shopId, pageable);
         }
         
-        return mapToOrderResponse(orders);
+        List<OrderResponse> orderResponses = orders.getContent().stream()
+                .map(this::mapToOrderResponseSingle)
+                .collect(Collectors.toList());
+
+        return WebResponse.<List<OrderResponse>>builder()
+                .status("OK")
+                .code(200)
+                .data(orderResponses)
+                .paging(PagingResponse.builder()
+                        .currentPage(orders.getNumber())
+                        .totalPage(orders.getTotalPages())
+                        .size(orders.getSize())
+                        .build())
+                .build();
     }
 
     public WebResponse<String> updateOrderStatus(UUID orderId, String status){

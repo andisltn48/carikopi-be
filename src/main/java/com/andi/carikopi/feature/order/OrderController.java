@@ -20,8 +20,12 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping(path = "/get-by-shop-id/{shopId}")
-    public WebResponse<List<OrderResponse>> getOrderByShopId(@PathVariable("shopId") UUID shopId, @RequestParam(value = "order_number", required = false) String orderNumber) {
-        return orderService.getOrderByShopId(shopId, orderNumber);
+    public WebResponse<List<OrderResponse>> getOrderByShopId(
+            @PathVariable("shopId") UUID shopId,
+            @RequestParam(value = "order_number", required = false) String orderNumber,
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+        return orderService.getOrderByShopId(shopId, orderNumber, page, size);
     }
 
     @GetMapping(path = "/get-by-order-number/{orderNumber}")
