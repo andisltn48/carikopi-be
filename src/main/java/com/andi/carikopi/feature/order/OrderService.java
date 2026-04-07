@@ -67,7 +67,7 @@ public class OrderService {
     }
 
     public WebResponse<List<OrderResponse>> getOrderByUniqueSessionAndShopId(String uniqueSession, UUID shopId){
-        List<Order> orders = orderRepository.findAllByUniqueSessionAndShopId(uniqueSession, shopId);
+        List<Order> orders = orderRepository.findAllByUniqueSessionAndShopIdOrderByCreatedAtAsc(uniqueSession, shopId);
         
         return mapToOrderResponse(orders);
     }
@@ -148,8 +148,13 @@ public class OrderService {
         return orderResponse;
     }
 
-    public WebResponse<List<OrderResponse>> getOrderByShopId(UUID shopId){
-        List<Order> orders = orderRepository.findAllByShopId(shopId);
+    public WebResponse<List<OrderResponse>> getOrderByShopId(UUID shopId, String orderNumber){
+        List<Order> orders;
+        if (orderNumber != null && !orderNumber.isBlank()) {
+            orders = orderRepository.findAllByShopIdAndOrderNumberContainingIgnoreCaseOrderByCreatedAtAsc(shopId, orderNumber);
+        } else {
+            orders = orderRepository.findAllByShopIdOrderByCreatedAtAsc(shopId);
+        }
         
         return mapToOrderResponse(orders);
     }

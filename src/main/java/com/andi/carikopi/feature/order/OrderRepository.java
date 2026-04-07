@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
     Optional<Order> findByOrderNumber(String orderNumber);
-    List<Order> findAllByUniqueSessionAndShopId(String uniqueSession, UUID shopId);
-    List<Order> findAllByShopId(UUID shopId);
+    List<Order> findAllByUniqueSessionAndShopIdOrderByCreatedAtAsc(String uniqueSession, UUID shopId);
+    List<Order> findAllByShopIdOrderByCreatedAtAsc(UUID shopId);
+    List<Order> findAllByShopIdAndOrderNumberContainingIgnoreCaseOrderByCreatedAtAsc(UUID shopId, String orderNumber);
 }

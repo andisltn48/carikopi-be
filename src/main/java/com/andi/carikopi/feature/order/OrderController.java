@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.andi.carikopi.common.WebResponse;
@@ -19,8 +20,8 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping(path = "/get-by-shop-id/{shopId}")
-    public WebResponse<List<OrderResponse>> getOrderByShopId(@PathVariable("shopId") UUID shopId) {
-        return orderService.getOrderByShopId(shopId);
+    public WebResponse<List<OrderResponse>> getOrderByShopId(@PathVariable("shopId") UUID shopId, @RequestParam(value = "order_number", required = false) String orderNumber) {
+        return orderService.getOrderByShopId(shopId, orderNumber);
     }
 
     @GetMapping(path = "/get-by-order-number/{orderNumber}")
