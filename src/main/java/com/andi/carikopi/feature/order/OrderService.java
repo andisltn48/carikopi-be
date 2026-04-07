@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,8 +16,11 @@ import com.andi.carikopi.feature.coffeeshop.CoffeeShop;
 import com.andi.carikopi.feature.coffeeshop.CoffeeShopRepository;
 import com.andi.carikopi.feature.menu.Menu;
 import com.andi.carikopi.feature.menu.MenuRepository;
+import com.andi.carikopi.feature.menu.dto.MenuResponse;
 import com.andi.carikopi.feature.order.dto.OrderMenuRequest;
+import com.andi.carikopi.feature.order.dto.OrderMenuResponse;
 import com.andi.carikopi.feature.order.dto.OrderRequest;
+import com.andi.carikopi.feature.order.dto.OrderResponse;
 
 @Service
 public class OrderService {
@@ -62,22 +66,35 @@ public class OrderService {
                 .build();
     }
 
-    public WebResponse<List<Order>> getOrderByUniqueSessionAndShopId(String uniqueSession, UUID shopId){
-        List<Order> order = orderRepository.findAllByUniqueSessionAndShopId(uniqueSession, shopId);
-        return WebResponse.<List<Order>>builder()
+    public WebResponse<List<OrderResponse>> getOrderByUniqueSessionAndShopId(String uniqueSession, UUID shopId){
+        List<Order> orders = orderRepository.findAllByUniqueSessionAndShopId(uniqueSession, shopId);
+        
+        return mapToOrderResponse(orders);
+    }
+
+    public WebResponse<OrderResponse> getOrderByOrderNumber(String orderNumber){
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        
+        OrderResponse orderResponse = mapToOrderResponseSingle(order);
+        
+        return WebResponse.<OrderResponse>builder()
                 .status("OK")
                 .code(200)
-                .data(order)
+                .data(orderResponse)
                 .build();
     }
 
-    public WebResponse<Order> getOrderByOrderNumber(String orderNumber){
-        Order order = orderRepository.findByOrderNumber(orderNumber)
+    public WebResponse<OrderResponse> getOrderByOrderId(UUID orderId){
+        Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
-        return WebResponse.<Order>builder()
+        
+        OrderResponse orderResponse = mapToOrderResponseSingle(order);
+        
+        return WebResponse.<OrderResponse>builder()
                 .status("OK")
                 .code(200)
-                .data(order)
+                .data(orderResponse)
                 .build();
     }
 
@@ -86,4 +103,69 @@ public class OrderService {
         String timestamp = String.valueOf(System.currentTimeMillis());
         return prefix + timestamp;
     }
+
+    private WebResponse<List<OrderResponse>> mapToOrderResponse(List<Order> orders) {
+        List<OrderResponse> orderResponses = new ArrayList<>();
+        for (Order order : orders) {
+            OrderResponse orderResponse = mapToOrderResponseSingle(order);
+            orderResponses.add(orderResponse);
+        }
+        return WebResponse.<List<OrderResponse>>builder()
+                .status("OK")
+                .code(200)
+                .data(orderResponses)
+                .build();
+    }
+
+    private OrderResponse mapToOrderResponseSingle(Order order) {
+        OrderResponse orderResponse = OrderResponse.builder()
+        .name(order.getName())
+        .phone(order.getPhone())
+        .totalPrice(order.getTotalPrice())
+        .orderMenus(order.getOrderMenus().stream().map(orderMenu -> {
+            MenuResponse menuResponse = MenuResponse.builder()
+            .id(orderMenu.getMenu().getId())
+            .nama(orderMenu.getMenu().getNama())
+            .harga(orderMenu.getMenu().getHarga())
+            .deskripsi(orderMenu.getMenu().getDeskripsi())
+            .build();
+
+            return OrderMenuResponse.builder()
+                    .menu(menuResponse)
+                    .quantity(orderMenu.getQuantity())
+                    .totalPrice(orderMenu.getTotalPrice())
+                    .notes(orderMenu.getNotes())
+                    .build();
+        }).collect(Collectors.toList()))
+        .status(order.getStatus())
+        .paymentStatus(order.getPaymentStatus())
+        .paymentMethod(order.getPaymentMethod())
+        .orderNumber(order.getOrderNumber())
+        .createdAt(order.getCreatedAt())
+        .id(order.getId())
+        .build();
+
+        return orderResponse;
+    }
+
+    public WebResponse<List<OrderResponse>> getOrderByShopId(UUID shopId){
+        List<Order> orders = orderRepository.findAllByShopId(shopId);
+        
+        return mapToOrderResponse(orders);
+    }
+
+    public WebResponse<String> updateOrderStatus(UUID orderId, String status){
+        Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        
+        order.setStatus(status);
+        orderRepository.save(order);
+        
+        return WebResponse.<String>builder()
+                .status("OK")
+                .code(200)
+                .data("Order status updated successfully")
+                .build();
+    }
+        
 }

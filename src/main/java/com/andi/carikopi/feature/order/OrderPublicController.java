@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.andi.carikopi.common.WebResponse;
 import com.andi.carikopi.feature.order.dto.OrderRequest;
+import com.andi.carikopi.feature.order.dto.OrderResponse;
 
 @RestController
 @RequestMapping("/api/public/orders")
@@ -28,12 +29,12 @@ public class OrderPublicController {
     }
 
     @GetMapping(path = "/get-by-unique-session/{uniqueSession}/{shopId}")
-    public WebResponse<List<Order>> getOrderByUniqueSession(@PathVariable("uniqueSession") String uniqueSession, @PathVariable("shopId") UUID shopId) {
+    public WebResponse<List<OrderResponse>> getOrderByUniqueSession(@PathVariable("uniqueSession") String uniqueSession, @PathVariable("shopId") UUID shopId) {
         return orderService.getOrderByUniqueSessionAndShopId(uniqueSession, shopId);
     }
 
     @GetMapping(path = "/get-by-order-number/{orderNumber}")
-    public WebResponse<Order> getOrderByOrderNumber(@PathVariable("orderNumber") String orderNumber) {
+    public WebResponse<OrderResponse> getOrderByOrderNumber(@PathVariable("orderNumber") String orderNumber) {
         return orderService.getOrderByOrderNumber(orderNumber);
     }
 }
