@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -71,14 +72,17 @@ public class OrderService {
     }
 
     public WebResponse<List<OrderResponse>> getOrderByUniqueSessionAndShopId(String uniqueSession, UUID shopId){
-        List<Order> orders = orderRepository.findAllByUniqueSessionAndShopIdOrderByCreatedAtAsc(uniqueSession, shopId);
+        Specification<Order> spec = Specification.where(OrderSpecification.belongsToShop(shopId))
+                .and(OrderSpecification.orderByCreatedAtAsc());
+        List<Order> orders = orderRepository.findAll(spec);
         
         return mapToOrderResponse(orders);
     }
 
     public WebResponse<OrderResponse> getOrderByOrderNumber(String orderNumber){
-        Order order = orderRepository.findByOrderNumber(orderNumber)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        Specification<Order> spec = Specification.where(OrderSpecification.orderNumberContains(orderNumber))
+                .and(OrderSpecification.orderByCreatedAtAsc());
+        Order order = orderRepository.findOne(spec).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
         
         OrderResponse orderResponse = mapToOrderResponseSingle(order);
         
@@ -152,14 +156,21 @@ public class OrderService {
         return orderResponse;
     }
 
-    public WebResponse<List<OrderResponse>> getOrderByShopId(UUID shopId, String orderNumber, Integer page, Integer size){
+    public WebResponse<List<OrderResponse>> getOrderByShopId(UUID shopId, String orderNumber, String status, Integer page, Integer size){
         Pageable pageable = PageRequest.of(page, size);
-        Page<Order> orders;
+
+        Specification<Order> spec = Specification.where(OrderSpecification.belongsToShop(shopId))
+                .and(OrderSpecification.orderByCreatedAtAsc());
+
         if (orderNumber != null && !orderNumber.isBlank()) {
-            orders = orderRepository.findAllByShopIdAndOrderNumberContainingIgnoreCaseOrderByCreatedAtAsc(shopId, orderNumber, pageable);
-        } else {
-            orders = orderRepository.findAllByShopIdOrderByCreatedAtAsc(shopId, pageable);
+            spec = spec.and(OrderSpecification.orderNumberContains(orderNumber));
         }
+
+        if (status != null && !status.isBlank()) {
+            spec = spec.and(OrderSpecification.hasStatus(status));
+        }
+
+        Page<Order> orders = orderRepository.findAll(spec, pageable);
         
         List<OrderResponse> orderResponses = orders.getContent().stream()
                 .map(this::mapToOrderResponseSingle)
