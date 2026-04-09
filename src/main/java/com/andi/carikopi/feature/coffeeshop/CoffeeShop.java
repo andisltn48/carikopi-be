@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.andi.carikopi.feature.auth.User;
+import com.andi.carikopi.feature.gallery.Gallery;
 import com.andi.carikopi.feature.menu.Menu;
 
 import java.util.List;
@@ -68,4 +69,7 @@ public class CoffeeShop {
 
     @Column(nullable = true)
     private String twitter;
+
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
+    private List<Gallery> galleries;
 }
