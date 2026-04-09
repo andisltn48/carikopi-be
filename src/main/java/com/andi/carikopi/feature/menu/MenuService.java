@@ -30,38 +30,55 @@ public class MenuService {
         @Value("${app.url}")
         private String appUrl;
 
-        public WebResponse<List<MenuResponse>> getMenusByShop(UUID shopId) {
+        public WebResponse<List<MenuResponse>> getMenusByShop(UUID shopId, String category) {
                 CoffeeShop shop = coffeeShopRepository.findById(shopId)
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                 "Coffeeshp not found!"));
 
-                List<MenuResponse> menus = menuRepository.findMenuByShop(shop).stream()
-                                .map(menu -> {
-                                        List<StorageFileResponse> files = new ArrayList<>();
-                                        for (UUID id : menu.getFoto()) {
-                                                StorageFile file = storageFileService.findById(id);
-                                                String fullUrl = appUrl + "api/files/" + file.getId();
-                                                StorageFileResponse storageFileResponse = StorageFileResponse.builder()
-                                                                .id(file.getId())
-                                                                .filename(file.getFilename())
-                                                                .url(fullUrl)
-                                                                .build();
-                                                files.add(storageFileResponse);
-                                        }
-                                        return MenuResponse.builder()
-                                                        .id(menu.getId())
-                                                        .nama(menu.getNama())
-                                                        .harga(menu.getHarga())
-                                                        .deskripsi(menu.getDeskripsi())
-                                                        .foto(files)
-                                                        .build();
-                                })
-                                .toList();
+                List<MenuResponse> favMenus = new ArrayList<>();
+                List<MenuResponse> normalMenus = new ArrayList<>();
+
+                List<Menu> menus = menuRepository.findMenuByShop(shop);
+                if (category != null) {
+                        menus = menuRepository.findMenuByShopAndCategory(shop, category);
+                }
+
+                for (Menu menu : menus) {
+                        List<StorageFileResponse> files = new ArrayList<>();
+                        for (UUID id : menu.getFoto()) {
+                                StorageFile file = storageFileService.findById(id);
+                                String fullUrl = appUrl + "api/files/" + file.getId();
+                                StorageFileResponse storageFileResponse = StorageFileResponse.builder()
+                                                .id(file.getId())
+                                                .filename(file.getFilename())
+                                                .url(fullUrl)
+                                                .build();
+                                files.add(storageFileResponse);
+                        }
+                        MenuResponse menuResponse = MenuResponse.builder()
+                                        .id(menu.getId())
+                                        .nama(menu.getNama())
+                                        .foto(files)
+                                        .deskripsi(menu.getDeskripsi())
+                                        .harga(menu.getHarga())
+                                        .isFavorite(menu.getIsFavorite())
+                                        .category(menu.getCategory())
+                                        .build();
+                        if (menu.getIsFavorite() != null && menu.getIsFavorite()) {
+                                favMenus.add(menuResponse);
+                        } else {
+                                normalMenus.add(menuResponse);
+                        }
+                }
+
+                List<MenuResponse> result = new ArrayList<>();
+                result.addAll(favMenus);
+                result.addAll(normalMenus);
 
                 return WebResponse.<List<MenuResponse>>builder()
                                 .code(200)
                                 .status("OK")
-                                .data(menus)
+                                .data(result)
                                 .errors(null)
                                 .build();
         }
@@ -75,6 +92,8 @@ public class MenuService {
                 menu.setNama(request.getNama());
                 menu.setDeskripsi(request.getDeskripsi());
                 menu.setHarga(request.getHarga());
+                menu.setCategory(request.getCategory());
+                menu.setIsFavorite(request.getIsFavorite());
                 menu.setShop(shop);
 
                 // handle upload foto
@@ -97,6 +116,8 @@ public class MenuService {
                 menu.setNama(request.getNama());
                 menu.setHarga(request.getHarga());
                 menu.setDeskripsi(request.getDeskripsi());
+                menu.setCategory(request.getCategory());
+                menu.setIsFavorite(request.getIsFavorite());
 
                 menuRepository.save(menu);
 

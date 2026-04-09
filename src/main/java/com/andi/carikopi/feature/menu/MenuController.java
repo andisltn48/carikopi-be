@@ -20,8 +20,8 @@ public class MenuController {
     private MenuService menuService;
 
     @GetMapping("/{shopId}")
-    public WebResponse<List<MenuResponse>> getMenusByShop(@PathVariable("shopId") UUID shopId) {
-        return menuService.getMenusByShop(shopId);
+    public WebResponse<List<MenuResponse>> getMenusByShop(@PathVariable("shopId") UUID shopId, @RequestParam(value = "category", required = false) String category) {
+        return menuService.getMenusByShop(shopId, category);
     }
 
     @PostMapping(value = "/{shopId}/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

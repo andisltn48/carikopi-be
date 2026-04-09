@@ -37,4 +37,8 @@ public class Menu {
     @JoinColumn(name = "shop_id", referencedColumnName = "id")
     private CoffeeShop shop;
 
+    private String category;
+
+    private Boolean isFavorite;
+
 }

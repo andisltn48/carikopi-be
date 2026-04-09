@@ -20,4 +20,8 @@ public class MenuResponse {
     private List<StorageFileResponse> foto;
 
     private String deskripsi;
+
+    private Boolean isFavorite;
+
+    private String category;
 }

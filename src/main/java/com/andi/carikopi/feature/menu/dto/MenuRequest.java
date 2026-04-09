@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -19,4 +21,9 @@ public class MenuRequest {
     private List<MultipartFile> foto;
 
     private String deskripsi;
+
+    private String category;
+
+    @JsonProperty("is_favorite")
+    private Boolean isFavorite;
 }

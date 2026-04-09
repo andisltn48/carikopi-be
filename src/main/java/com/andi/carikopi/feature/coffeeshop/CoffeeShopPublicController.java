@@ -29,8 +29,8 @@ public class CoffeeShopPublicController {
     }
 
     @GetMapping("/{shopId}/menu")
-    public WebResponse<List<MenuResponse>> getMenusByShop(@PathVariable("shopId") UUID shopId) {
-        return menuService.getMenusByShop(shopId);
+    public WebResponse<List<MenuResponse>> getMenusByShop(@PathVariable("shopId") UUID shopId, @RequestParam(value = "category", required = false) String category) {
+        return menuService.getMenusByShop(shopId, category);
     }
 
     @GetMapping("/nearby")
