@@ -3,7 +3,9 @@ package com.andi.carikopi.feature.coffeeshop;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.locationtech.jts.geom.Point;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.andi.carikopi.feature.auth.User;
@@ -39,15 +41,21 @@ public class CoffeeShop {
     @Column(nullable = true)
     private UUID fotoProfil;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @JsonIgnore
     @Column(columnDefinition = "geometry(Point, 4326)")
     private Point location;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
     private List<Menu> menus;
@@ -70,6 +78,13 @@ public class CoffeeShop {
     @Column(nullable = true)
     private String twitter;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
     private List<Gallery> galleries;
+
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String xenditApiKey;
+
+    private String xenditCallbackToken;
 }

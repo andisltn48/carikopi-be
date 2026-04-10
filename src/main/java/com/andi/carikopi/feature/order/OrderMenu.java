@@ -16,7 +16,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "order_menus")
@@ -28,6 +30,8 @@ public class OrderMenu {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id", referencedColumnName = "id")
     private Menu menu;
@@ -41,6 +45,8 @@ public class OrderMenu {
     @Column(name = "notes")
     private String notes;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", referencedColumnName = "id")

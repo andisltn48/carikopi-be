@@ -45,4 +45,13 @@ public class OrderResponse {
 
     @JsonProperty("order_type")
     private String orderType;
+
+    @JsonProperty("payment_url")
+    private String paymentUrl;
+
+    @JsonProperty("qr_string")
+    private String qrString;
+
+    @JsonProperty("qr_id")
+    private String qrId;
 }

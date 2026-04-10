@@ -62,6 +62,8 @@ public class CoffeeShopService {
         coffeeShop.setWhatsapp(request.getWhatsapp());
         coffeeShop.setFacebook(request.getFacebook());
         coffeeShop.setTwitter(request.getTwitter());
+        coffeeShop.setXenditApiKey(request.getXenditApiKey());
+        coffeeShop.setXenditCallbackToken(request.getXenditCallbackToken());
 
         if (request.getFotoProfil() != null) {
             UUID fileId = storageFileService.uploadFile(request.getFotoProfil(), "foto_profil");
@@ -184,7 +186,9 @@ public class CoffeeShopService {
                 .tiktok(coffeeShop.getTiktok())
                 .whatsapp(coffeeShop.getWhatsapp())
                 .facebook(coffeeShop.getFacebook())
-                .twitter(coffeeShop.getTwitter());
+                .twitter(coffeeShop.getTwitter())
+                .xenditApiKey(coffeeShop.getXenditApiKey())
+                .xenditCallbackToken(coffeeShop.getXenditCallbackToken());
 
         if (coffeeShop.getLocation() != null) {
             builder.latitude(coffeeShop.getLocation().getY());

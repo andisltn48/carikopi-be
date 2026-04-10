@@ -37,4 +37,10 @@ public class CoffeeShopResponse {
     private String whatsapp;
     private String facebook;
     private String twitter;
+
+    @JsonProperty("xendit_api_key")
+    private String xenditApiKey;
+
+    @JsonProperty("xendit_callback_token")
+    private String xenditCallbackToken;
 }

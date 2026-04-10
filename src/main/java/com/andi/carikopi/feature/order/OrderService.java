@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import com.andi.carikopi.feature.order.dto.OrderMenuRequest;
 import com.andi.carikopi.feature.order.dto.OrderMenuResponse;
 import com.andi.carikopi.feature.order.dto.OrderRequest;
 import com.andi.carikopi.feature.order.dto.OrderResponse;
+import com.andi.carikopi.feature.payment.PaymentService;
 
 @Service
 public class OrderService {
@@ -37,6 +39,7 @@ public class OrderService {
     @Autowired private CoffeeShopRepository coffeeShopRepository;
     @Autowired private MenuRepository menuRepository;
     @Autowired private RedisTemplate<String, String> redisTemplate;
+    @Autowired private PaymentService paymentService;
 
     private static final String QUEUE_KEY_PREFIX = "queue:coffeeshop:";
 
@@ -96,10 +99,21 @@ public class OrderService {
         }
         order.setOrderMenus(orderMenus);
         orderRepository.save(order);
+
+        OrderResponse orderResponse = mapToOrderResponseSingle(order);
+        if (!isAdmin) {
+            // String paymentUrl = paymentService.createInvoice(shop, order);
+            // orderResponse.setPaymentUrl(paymentUrl);
+
+            Map<String, Object> qrCode = paymentService.createQRCode(shop, order);
+            orderResponse.setQrString((String) qrCode.get("qr_string"));
+            orderResponse.setQrId((String) qrCode.get("id"));
+        }
+        
         return WebResponse.<OrderResponse>builder()
                 .status("OK")
                 .code(200)
-                .data(mapToOrderResponseSingle(order))
+                .data(orderResponse)
                 .build();
     }
 
