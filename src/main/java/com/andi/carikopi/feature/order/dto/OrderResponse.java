@@ -42,4 +42,7 @@ public class OrderResponse {
 
     @JsonProperty("queue_number")
     private String queueNumber;
+
+    @JsonProperty("order_type")
+    private String orderType;
 }

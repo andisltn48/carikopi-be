@@ -66,4 +66,7 @@ public class Order {
 
     @Column(name = "queue_number")
     private String queueNumber;
+
+    @Column(name = "order_type")
+    private String orderType;
 }

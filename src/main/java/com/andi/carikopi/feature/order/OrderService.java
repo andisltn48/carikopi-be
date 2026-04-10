@@ -68,6 +68,7 @@ public class OrderService {
         order.setOrderNumber(generateOrderNumber());
         order.setUniqueSession(request.getUniqueSession());
         order.setQueueNumber(generateQueueNumber());
+        order.setOrderType(request.getOrderType());
 
         List<OrderMenu> orderMenus = new ArrayList<>();
         for (OrderMenuRequest orderMenuRequest : request.getOrderMenus()) {
@@ -94,6 +95,7 @@ public class OrderService {
 
     public WebResponse<List<OrderResponse>> getOrderByUniqueSessionAndShopId(String uniqueSession, UUID shopId){
         Specification<Order> spec = Specification.where(OrderSpecification.belongsToShop(shopId))
+                .and(OrderSpecification.uniqueSessionContains(uniqueSession))
                 .and(OrderSpecification.orderByCreatedAtAsc());
         List<Order> orders = orderRepository.findAll(spec);
         
@@ -172,6 +174,7 @@ public class OrderService {
         .orderNumber(order.getOrderNumber())
         .createdAt(order.getCreatedAt())
         .queueNumber(order.getQueueNumber())
+        .orderType(order.getOrderType())
         .id(order.getId())
         .build();
 

@@ -29,4 +29,7 @@ public class OrderRequest {
 
     @JsonProperty("unique_session")
     private String uniqueSession;
+
+    @JsonProperty("order_type")
+    private String orderType;
 }

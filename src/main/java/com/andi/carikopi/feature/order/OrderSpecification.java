@@ -27,4 +27,8 @@ public class OrderSpecification {
             return cb.conjunction();
         };
     }
+
+    public static Specification<Order> uniqueSessionContains(String uniqueSession) {
+        return (root, query, cb) -> cb.equal(root.get("uniqueSession"), uniqueSession);
+    }
 }
