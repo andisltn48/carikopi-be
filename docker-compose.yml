@@ -33,6 +33,7 @@ services:
       APP_URL: https://carikopi-api.capturah.my.id/
       # Make sure the app can write to the uploads folder
       APP_UPLOAD_DIR: /app/uploads/
+      SPRING_DATA_REDIS_HOST: redis
     volumes:
       - ./uploads:/app/uploads
 
