@@ -32,4 +32,10 @@ public class OrderRequest {
 
     @JsonProperty("order_type")
     private String orderType;
+
+    @JsonProperty("payment_method")
+    private String paymentMethod;
+
+    @JsonProperty("status")
+    private String status;
 }

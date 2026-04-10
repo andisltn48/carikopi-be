@@ -53,7 +53,7 @@ public class OrderService {
         return String.format("%04d", nextNumber);
     }
 
-    public WebResponse<String> createOrder(OrderRequest request){
+    public WebResponse<OrderResponse> createOrder(OrderRequest request, Boolean isAdmin){
         
         CoffeeShop shop = coffeeShopRepository.findById(request.getShopId())
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coffee shop not found"));
@@ -69,6 +69,16 @@ public class OrderService {
         order.setUniqueSession(request.getUniqueSession());
         order.setQueueNumber(generateQueueNumber());
         order.setOrderType(request.getOrderType());
+
+        if (isAdmin) {
+            order.setPaymentMethod(request.getPaymentMethod());
+            order.setPaymentStatus("PAID");
+            order.setStatus(request.getStatus());
+        } else {
+            order.setPaymentMethod("QRIS");
+            order.setPaymentStatus("UNPAID");
+            order.setStatus("PENDING");
+        }
 
         List<OrderMenu> orderMenus = new ArrayList<>();
         for (OrderMenuRequest orderMenuRequest : request.getOrderMenus()) {
@@ -86,10 +96,10 @@ public class OrderService {
         }
         order.setOrderMenus(orderMenus);
         orderRepository.save(order);
-        return WebResponse.<String>builder()
+        return WebResponse.<OrderResponse>builder()
                 .status("OK")
                 .code(200)
-                .data("Order created successfully")
+                .data(mapToOrderResponseSingle(order))
                 .build();
     }
 

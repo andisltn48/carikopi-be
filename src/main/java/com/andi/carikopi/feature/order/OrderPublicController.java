@@ -24,8 +24,8 @@ public class OrderPublicController {
 
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public WebResponse<String> createOrder(@RequestBody OrderRequest request) {
-        return orderService.createOrder(request);
+    public WebResponse<OrderResponse> createOrder(@RequestBody OrderRequest request) {
+        return orderService.createOrder(request, false);
     }
 
     @GetMapping(path = "/get-by-unique-session/{uniqueSession}/{shopId}")
