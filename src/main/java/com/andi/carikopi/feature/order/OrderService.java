@@ -1,9 +1,12 @@
 package com.andi.carikopi.feature.order;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,6 +36,22 @@ public class OrderService {
     @Autowired private OrderRepository orderRepository;
     @Autowired private CoffeeShopRepository coffeeShopRepository;
     @Autowired private MenuRepository menuRepository;
+    @Autowired private RedisTemplate<String, String> redisTemplate;
+
+    private static final String QUEUE_KEY_PREFIX = "queue:coffeeshop:";
+
+    public String generateQueueNumber() {
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String key = QUEUE_KEY_PREFIX + today;
+        
+        Long nextNumber = redisTemplate.opsForValue().increment(key);
+
+        if (nextNumber == 1) {
+            redisTemplate.expire(key, 48, TimeUnit.HOURS);
+        }
+        
+        return String.format("%04d", nextNumber);
+    }
 
     public WebResponse<String> createOrder(OrderRequest request){
         
@@ -47,6 +67,7 @@ public class OrderService {
         order.setShop(shop);
         order.setOrderNumber(generateOrderNumber());
         order.setUniqueSession(request.getUniqueSession());
+        order.setQueueNumber(generateQueueNumber());
 
         List<OrderMenu> orderMenus = new ArrayList<>();
         for (OrderMenuRequest orderMenuRequest : request.getOrderMenus()) {
@@ -150,6 +171,7 @@ public class OrderService {
         .paymentMethod(order.getPaymentMethod())
         .orderNumber(order.getOrderNumber())
         .createdAt(order.getCreatedAt())
+        .queueNumber(order.getQueueNumber())
         .id(order.getId())
         .build();
 

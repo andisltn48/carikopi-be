@@ -46,5 +46,20 @@ services:
       - TUNNEL_TOKEN=eyJhIjoiZjUzZTYyZjFkZGExZDZiNGViYWY2ODc0MGFlNThhNDgiLCJ0IjoiMzJjNWRiOTEtYmVjMS00NjIyLWE3ZmEtN2M2ZmVmNjFiMDVjIiwicyI6Ik9URTNNRE01TXprdE9XTXpZeTAwT0daaExUZ3pPV0V0WldFME9HTTBNV1V6TkRCbCJ9
     depends_on:
       - carikopiapp
+
+  redis:
+    image: redis:7-alpine
+    container_name: carikopi-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
 volumes:
   postgres_data:

@@ -39,4 +39,7 @@ public class OrderResponse {
 
     @JsonProperty("created_at")
     private Date createdAt;
+
+    @JsonProperty("queue_number")
+    private String queueNumber;
 }

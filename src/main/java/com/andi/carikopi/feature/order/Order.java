@@ -63,4 +63,7 @@ public class Order {
     private Date createdAt;
 
     private String uniqueSession;
+
+    @Column(name = "queue_number")
+    private String queueNumber;
 }
