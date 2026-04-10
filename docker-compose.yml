@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   db:
@@ -63,3 +62,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
