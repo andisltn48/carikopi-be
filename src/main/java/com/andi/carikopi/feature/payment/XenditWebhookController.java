@@ -50,7 +50,7 @@ public class XenditWebhookController {
 
         String status = (String) payload.get("status");
         if ("PAID".equals(status)) {
-            order.setStatus("PAID");
+            order.setPaymentStatus("PAID");
             orderRepository.save(order);
         }
 
