@@ -187,7 +187,8 @@ public class CoffeeShopService {
                 .facebook(coffeeShop.getFacebook())
                 .twitter(coffeeShop.getTwitter())
                 .xenditApiKey(coffeeShop.getXenditApiKey())
-                .xenditCallbackToken(coffeeShop.getXenditCallbackToken());
+                .xenditCallbackToken(coffeeShop.getXenditCallbackToken())
+                .registerToken(coffeeShop.getRegisterToken());
 
         if (coffeeShop.getLocation() != null) {
             builder.latitude(coffeeShop.getLocation().getY());
@@ -228,9 +229,11 @@ public class CoffeeShopService {
         CoffeeShop coffeeShop = coffeeShopRepository.findById(shopId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coffee shop not found"));
 
-        storageFileService.deleteFile(coffeeShop.getFotoProfil());
-        coffeeShop.setFotoProfil(null);
-        coffeeShopRepository.save(coffeeShop);
+        if (coffeeShop.getFotoProfil() != null) {
+            storageFileService.deleteFile(coffeeShop.getFotoProfil());
+            coffeeShop.setFotoProfil(null);
+            coffeeShopRepository.save(coffeeShop);
+        }
 
         return WebResponse.<String>builder()
                 .code(200)
@@ -262,14 +265,16 @@ public class CoffeeShopService {
             response.setLongitude(coffeeShop.getLocation().getX());
         }
 
-        StorageFile storageFile = storageFileService.findById(coffeeShop.getFotoProfil());
-        String fullUrl = appUrl + "api/files/" + storageFile.getId();
-        StorageFileResponse storageFileResponse = StorageFileResponse.builder()
-                .id(storageFile.getId())
-                .url(fullUrl)
-                .filename(storageFile.getFilename())
-                .build();
-        response.setFotoProfil(storageFileResponse);
+        if (coffeeShop.getFotoProfil() != null) {
+            StorageFile storageFile = storageFileService.findById(coffeeShop.getFotoProfil());
+            String fullUrl = appUrl + "api/files/" + storageFile.getId();
+            StorageFileResponse storageFileResponse = StorageFileResponse.builder()
+                    .id(storageFile.getId())
+                    .url(fullUrl)
+                    .filename(storageFile.getFilename())
+                    .build();
+            response.setFotoProfil(storageFileResponse);
+        }
 
         return WebResponse.<CoffeeShopResponse>builder()
                 .code(200)

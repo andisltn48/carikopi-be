@@ -33,6 +33,8 @@ import com.andi.carikopi.feature.order.dto.OrderRequest;
 import com.andi.carikopi.feature.order.dto.OrderResponse;
 import com.andi.carikopi.feature.payment.PaymentService;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class OrderService {
     @Autowired private OrderRepository orderRepository;
@@ -56,6 +58,7 @@ public class OrderService {
         return String.format("%04d", nextNumber);
     }
 
+    @Transactional
     public WebResponse<OrderResponse> createOrder(OrderRequest request, Boolean isAdmin){
         
         CoffeeShop shop = coffeeShopRepository.findById(request.getShopId())

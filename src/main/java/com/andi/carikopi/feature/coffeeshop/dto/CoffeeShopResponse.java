@@ -43,4 +43,7 @@ public class CoffeeShopResponse {
 
     @JsonProperty("xendit_callback_token")
     private String xenditCallbackToken;
+
+    @JsonProperty("register_token")
+    private String registerToken;
 }
