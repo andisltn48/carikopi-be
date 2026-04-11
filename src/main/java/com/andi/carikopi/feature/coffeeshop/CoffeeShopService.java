@@ -1,6 +1,8 @@
 package com.andi.carikopi.feature.coffeeshop;
 import com.andi.carikopi.feature.coffeeshop.dto.CoffeeShopRequest;
 import com.andi.carikopi.feature.coffeeshop.dto.CoffeeShopResponse;
+import com.andi.carikopi.feature.coffeeshop.dto.XenditApiRequest;
+import com.andi.carikopi.feature.coffeeshop.dto.XenditApiResponse;
 import com.andi.carikopi.feature.storage.dto.StorageFileResponse;
 import com.andi.carikopi.feature.auth.dto.UserResponse;
 import com.andi.carikopi.common.WebResponse;
@@ -62,8 +64,6 @@ public class CoffeeShopService {
         coffeeShop.setWhatsapp(request.getWhatsapp());
         coffeeShop.setFacebook(request.getFacebook());
         coffeeShop.setTwitter(request.getTwitter());
-        coffeeShop.setXenditApiKey(request.getXenditApiKey());
-        coffeeShop.setXenditCallbackToken(request.getXenditCallbackToken());
 
         if (request.getFotoProfil() != null) {
             UUID fileId = storageFileService.uploadFile(request.getFotoProfil(), "foto_profil");
@@ -276,6 +276,38 @@ public class CoffeeShopService {
                 .code(200)
                 .status("OK")
                 .data(response)
+                .build();
+    }
+
+    public WebResponse<XenditApiResponse> updateXenditApi(UUID shopId, XenditApiRequest request) {
+        CoffeeShop coffeeShop = coffeeShopRepository.findById(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coffee shop not found"));
+
+        coffeeShop.setXenditApiKey(request.getXenditApiKey());
+        coffeeShop.setXenditCallbackToken(request.getXenditCallbackToken());
+        coffeeShopRepository.save(coffeeShop);
+
+        return WebResponse.<XenditApiResponse>builder()
+                .code(200)
+                .status("OK")
+                .data(XenditApiResponse.builder()
+                        .xenditApiKey(coffeeShop.getXenditApiKey())
+                        .xenditCallbackToken(coffeeShop.getXenditCallbackToken())
+                        .build())
+                .build();
+    }
+
+    public WebResponse<XenditApiResponse> getXenditApi(UUID shopId) {
+        CoffeeShop coffeeShop = coffeeShopRepository.findById(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Coffee shop not found"));
+
+        return WebResponse.<XenditApiResponse>builder()
+                .code(200)
+                .status("OK")
+                .data(XenditApiResponse.builder()
+                        .xenditApiKey(coffeeShop.getXenditApiKey())
+                        .xenditCallbackToken(coffeeShop.getXenditCallbackToken())
+                        .build())
                 .build();
     }
 }
