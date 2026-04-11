@@ -38,7 +38,7 @@ public class PaymentService {
         Xendit.apiKey = shop.getXenditApiKey();
 
         Map<String, Object> params = new HashMap<>();
-        String externalId = "INV-" + shop.getId() + "-" + System.currentTimeMillis();
+        String externalId = "INV:" + shop.getId() + ":" + order.getId();
         params.put("external_id", externalId);
         params.put("amount", order.getTotalPrice());
         String description = "Pesanan Antrean #" + order.getQueueNumber() + " di " + shop.getNamaToko();
@@ -63,7 +63,7 @@ public class PaymentService {
     public Map<String, Object> createQRCode(CoffeeShop shop, Order order) {
         Xendit.apiKey = shop.getXenditApiKey();
 
-        String externalId = "QR-" + shop.getId() + "-" + order.getId();
+        String externalId = "QR:" + shop.getId() + ":" + order.getId();
         String description = "Pesanan Antrean #" + order.getQueueNumber() + " di " + shop.getNamaToko();
 
         XenditPaymentRequest request = XenditPaymentRequest.builder()
