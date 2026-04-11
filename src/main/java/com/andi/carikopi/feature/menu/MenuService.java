@@ -38,9 +38,9 @@ public class MenuService {
                 List<MenuResponse> favMenus = new ArrayList<>();
                 List<MenuResponse> normalMenus = new ArrayList<>();
 
-                List<Menu> menus = menuRepository.findMenuByShop(shop);
+                List<Menu> menus = menuRepository.findByShopAndActiveTrue(shop);
                 if (category != null) {
-                        menus = menuRepository.findMenuByShopAndCategory(shop, category);
+                        menus = menuRepository.findByShopAndCategoryAndActiveTrue(shop, category);
                 }
 
                 for (Menu menu : menus) {
@@ -213,7 +213,8 @@ public class MenuService {
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                 "Menu not found!"));
 
-                menuRepository.delete(menu);
+                menu.setActive(false);
+                menuRepository.save(menu);
 
                 return WebResponse.<String>builder()
                                 .code(200)

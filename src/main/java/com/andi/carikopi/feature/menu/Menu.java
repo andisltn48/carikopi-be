@@ -40,5 +40,8 @@ public class Menu {
     private String category;
 
     private Boolean isFavorite;
+    
+    @Column(name = "active")
+    private Boolean active = true;
 
 }
