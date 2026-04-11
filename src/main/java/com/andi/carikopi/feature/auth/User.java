@@ -26,6 +26,7 @@ public class User {
 
     private Integer role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private CoffeeShop coffeeShop;
+    @ManyToOne
+    @JoinColumn(name = "shop_id")
+    private CoffeeShop shop;
 }

@@ -50,9 +50,8 @@ public class CoffeeShop {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
+    private List<User> users;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
@@ -87,4 +86,6 @@ public class CoffeeShop {
     private String xenditApiKey;
 
     private String xenditCallbackToken;
+
+    private String registerToken;
 }

@@ -56,7 +56,6 @@ public class CoffeeShopService {
         coffeeShop.setNamaToko(request.getNamaToko());
         coffeeShop.setAlamat(request.getAlamat());
         coffeeShop.setDeskripsi(request.getDeskripsi());
-        coffeeShop.setUser(user);
         coffeeShop.setTags(request.getTags());
         coffeeShop.setCity(request.getCity());
         coffeeShop.setInstagram(request.getInstagram());
@@ -85,7 +84,7 @@ public class CoffeeShopService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        CoffeeShop coffeeShop = coffeeShopRepository.findCoffeeShopByUser(user);
+        CoffeeShop coffeeShop = user.getShop();
 
         return getCoffeeShopResponseWebResponse(user, coffeeShop, null);
     }

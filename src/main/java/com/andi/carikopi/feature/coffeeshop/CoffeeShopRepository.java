@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface CoffeeShopRepository extends JpaRepository<CoffeeShop, UUID> {
-    CoffeeShop findCoffeeShopByUser(User user);
 
     @Query(value = """
             SELECT cs.id, cs.alamat, cs.deskripsi, cs.foto_profil, cs.location,
@@ -58,4 +58,6 @@ public interface CoffeeShopRepository extends JpaRepository<CoffeeShop, UUID> {
             @Param("radiusMeters") double radiusMeters,
             @Param("query") String query
     );
+
+    Optional<CoffeeShop> findByRegisterToken(String registerToken);
 }
