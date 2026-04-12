@@ -1,9 +1,12 @@
 package com.andi.carikopi.feature.order;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -252,6 +255,55 @@ public class OrderService {
                 .code(200)
                 .data("Order status updated successfully")
                 .build();
-    }
+    }   
+    public Map<String, Object> getPenjualanHariIni(UUID shopId) {
+        Specification<Order> spec = Specification.where(OrderSpecification.belongsToShop(shopId))
+                .and(OrderSpecification.orderCompleted())
+                .and(OrderSpecification.orderCreatedToday());
         
+        List<Order> orders = orderRepository.findAll(spec);
+
+        double totalPenjualan = orders.stream()
+                .mapToDouble(Order::getTotalPrice)
+                .sum();
+
+        return Map.of(
+            "total_penjualan", totalPenjualan
+        );
+    }
+
+    public List<Map<String, Object>> getGrafikPenjualan(UUID shopId) {
+        LocalDate today = LocalDate.now();
+        LocalDate sevenDaysAgo = today.minusDays(6);
+        
+        Date start = Date.from(sevenDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date end = Date.from(today.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
+        
+        Specification<Order> spec = Specification.where(OrderSpecification.belongsToShop(shopId))
+                .and(OrderSpecification.orderCompleted())
+                .and((root, query, cb) -> cb.between(root.get("createdAt"), start, end));
+        
+        List<Order> orders = orderRepository.findAll(spec);
+        
+        List<Map<String, Object>> result = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM");
+        
+        for (int i = 0; i < 7; i++) {
+            LocalDate date = sevenDaysAgo.plusDays(i);
+            String dateStr = date.format(formatter);
+            
+            double total = orders.stream()
+                .filter(o -> o.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isEqual(date))
+                .mapToDouble(Order::getTotalPrice)
+                .sum();
+            
+            Map<String, Object> data = new HashMap<>();
+            data.put("label", dateStr);
+            data.put("value", total);
+            result.add(data);
+        }
+        
+        return result;
+    }
+
 }
